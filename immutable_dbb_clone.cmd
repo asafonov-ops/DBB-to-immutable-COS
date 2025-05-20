@@ -49,7 +49,7 @@ echo DBB latest series: $DBB_LATEST_SERIES
 # do echo Cloning $i ; $CMD copy $SRC:$i $DST:/$DST_BUCKET/$INSTANCE_ID/volumes/DBV/ $FLAGS;
 #  done
 echo Cloning DBV objects to $DST_BUCKET/$INSTANCE_ID/
-$CMD cat $SRC:$SRC_BUCKET/$INSTANCE_ID/volhistory | egrep -A4 -B1 "Backup Series:\s+$DBB_LATEST_SERIES" | egrep -B4 -A1 "Device Class Name:\s+$DBB_DEVCLASS" | grep "Volume Name: " | awk -F '"' '{ print $2}' | awk -F '/' '{ print $2"/"$3"/"$4"/"$5}' | $CMD copy $FLAGS --files-from -  COS_C2LAB:$SRC_BUCKET COS_C2LAB_RETENTION:$DST_BUCKET
+$CMD cat $SRC:$SRC_BUCKET/$INSTANCE_ID/volhistory | egrep -A4 -B1 "Backup Series:\s+$DBB_LATEST_SERIES" | egrep -B4 -A1 "Device Class Name:\s+$DBB_DEVCLASS" | grep "Volume Name: " | awk -F '"' '{ print $2}' | awk -F '/' '{ print $2"/"$3"/"$4"/"$5}' | $CMD copy $FLAGS --files-from -  $SRC:$SRC_BUCKET $DST:$DST_BUCKET
 
 echo Cloning volhistory
 $CMD copy $SRC:$SRC_BUCKET/$INSTANCE_ID/volhistory $DST:/$DST_BUCKET/$INSTANCE_ID/volhistory.orig
