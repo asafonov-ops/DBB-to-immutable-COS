@@ -4,16 +4,16 @@ CMD=rclone                                                                      
 FLAGS="--s3-chunk-size 16M --s3-upload-cutoff 0  --disable ServerSideAcrossConfigs  --stats 1s --progress"      # For production deployment you may want to remove "--stats 1s --progress"
 
 SRC=COS_C2LAB                                                                                                   # rclone profile name, this profile must have at least read-only access to the
-                                                                                                                # vault where TSM writes DB backup
+                                                                                                                # vault where Storage Protect writes DB backup
 DST=COS_C2LAB_RETENTION                                                                                         # rclone profile name, this profile must have read/write access to the target
                                                                                                                 # retention enabled vault
 DBB_RETENTION_INTERVAL=4                                                                                        # Days to retain DBB clones bafore expiration. Note COS retention in managed separately
-INCLUDE_DBV="--include *.DBV"                                                                                   # TSM naming convention for DBB files/objects
-SRC_BUCKET=tsminst1dbb                                                                                          # Bucket name in TSM configuration where DBB is stored
+INCLUDE_DBV="--include *.DBV"                                                                                   # Storage Protect naming convention for DBB files/objects
+SRC_BUCKET=tsminst1dbb                                                                                          # Bucket name in Storage Protect configuration where DBB is stored
 DST_BUCKET=tsminst1dbbretday$(echo $(($(date +%s) / 86400))%$DBB_RETENTION_INTERVAL + 1| bc)                                            # Target retention enabled vault name, every day the name alternated day1 day2 day3 day4 day1 ...
 # DST_BUCKET=tsminst1dbb1d                                              # Target retention enabled vault name, every day the name alternated day1 day2 day3 day4 day1 ...
-INSTANCE_ID=dbbackup-tsminst1-c4fb71884961ee11955b82aaed4dffed                                                  # Name selected by your TSM server instance, must match your actual identifier
-DBB_DEVCLASS=DBBCOS                                                                                             # TSM devclass name used for DB backup 'backup DB devclass=DBBCOS type=full'
+INSTANCE_ID=dbbackup-tsminst1-c4fb71884961ee11955b82aaed4dffed                                                  # Name selected by your Storage Protect server instance, must match your actual identifier
+DBB_DEVCLASS=DBBCOS                                                                                             # Storage Protect devclass name used for DB backup 'backup DB devclass=DBBCOS type=full'
 
 DBV_COUNT=$($CMD ls $DST:$DST_BUCKET --include *DBV | wc -l)
 
@@ -66,7 +66,7 @@ $CMD cat  $DST:/$DST_BUCKET/$INSTANCE_ID/devconfig.orig/devconfig    | sed -e 's
 # Known Limitations:
 #
 # Only uses a single COS Accesser (defined in rclone profile)
-# Clones only one last TSM full DB Backup Series
-# Supports full TSM DBB only, no snapshots or incremental backups
-# No synchronization with the actual TSM "backup db" process, requires manual synchronization
+# Clones only one last Storage Protect full DB Backup Series
+# Supports full Storage Protect DBB only, no snapshots or incremental backups
+# No synchronization with the actual Storage Protect "backup db" process, requires manual synchronization
 # Target vault retention should be set to $DBB_RETENTION_INTERVAL-1 days
